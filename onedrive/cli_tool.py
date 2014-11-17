@@ -151,6 +151,17 @@ def main():
                          ' (any of these can be omitted) or a single "limit" number.')
     cmd.add_argument('-o', '--objects', action='store_true',
                      help='Dump full objects, not just name and id.')
+                     
+    cmd = add_command('list_links', help='List folder links.')
+    cmd.add_argument('folder',
+                  nargs='?', default='me/skydrive',
+                  help='Folder to list links  of (default: %(default)s).')
+    cmd.add_argument('-r', '--range', metavar='{[offset]-[limit] | limit}',
+                  help='List only specified range of objects inside.'
+                  ' Can be either dash-separated "offset-limit" tuple'
+                  ' (any of these can be omitted) or a single "limit" number.')
+    cmd.add_argument('-o', '--objects', action='store_true',
+                  help='Dump full objects, not just name and id.')
 
     cmd = add_command('mkdir', help='Create a folder.')
     cmd.add_argument('name',
@@ -285,7 +296,32 @@ def main():
                              ' or just "limit" format, with integers as both offset and'
                              ' limit (if not omitted). Provided: {}'.format(optz.range))
         res = list(api.listdir(resolve_path(optz.folder), offset=offset, limit=limit))
+        print(json.dumps(res, indent=4))
         if not optz.objects: res = map(op.itemgetter('name'), res)
+
+    elif optz.call == 'list_links':
+        offset = limit = None
+        if optz.range:
+            span = re.search(r'^(\d+)?[-:](\d+)?$', optz.range)
+            try:
+                if not span:
+                    limit = int(optz.range)
+                else:
+                    offset, limit = map(int, span.groups())
+            except ValueError:
+                parser.error('--range argument must be in the "[offset]-[limit]"'
+                             ' or just "limit" format, with integers as both offset and'
+                             ' limit (if not omitted). Provided: {}'.format(optz.range))
+        res = list(api.listdir(resolve_path(optz.folder), offset=offset, limit=limit))
+        for item in res:
+            # only list files
+            if item['type'] == 'file':
+                link_path = api.link(item['id'], 'shared_read_link')['link']
+                print (link_path.replace('redir.aspx', 'download'))
+
+        res = []
+
+
 
     elif optz.call == 'info':
         res = api.info(resolve_path(optz.object))
