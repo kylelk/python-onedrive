@@ -296,6 +296,8 @@ class OneDriveAPIWrapper(OneDriveAuth):
         by overriding http request method in subclass."""
 
     api_url_base = 'https://apis.live.net/v5.0/'
+    
+    auto_refresh_token = True
 
     def _api_url(self, path, query=dict(),
                  pass_access_token=True, pass_empty_values=False):
