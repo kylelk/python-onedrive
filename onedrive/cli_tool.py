@@ -296,6 +296,7 @@ def main():
                              ' or just "limit" format, with integers as both offset and'
                              ' limit (if not omitted). Provided: {}'.format(optz.range))
         res = list(api.listdir(resolve_path(optz.folder), offset=offset, limit=limit))
+        print(json.dumps(res, indent=4))
         if not optz.objects: res = map(op.itemgetter('name'), res)
 
     elif optz.call == 'list_links':
