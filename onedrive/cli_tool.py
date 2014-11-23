@@ -317,7 +317,6 @@ def main():
             # only list files
             if item['type'] == 'file':
                 link_path = api.link(item['id'], 'shared_read_link')['link']
-                print (item['name'])
                 print (link_path.replace('redir.aspx', 'download'))
 
         res = []
