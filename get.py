@@ -27,5 +27,5 @@ with open(file_name, "r") as f:
     data = json.loads(f.read())
 
 for item in data:
-    print item["name"]
+    print item["name"].encode("utf-8")
     print item["link"]
